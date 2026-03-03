@@ -15,6 +15,11 @@ def test_parse_args_motion_iou_thresh_override() -> None:
     assert config.motion_iou_thresh == 0.2
 
 
+def test_parse_args_startup_profile_flag() -> None:
+    config = parse_args(["--startup-profile"])
+    assert config.startup_profile is True
+
+
 @pytest.mark.parametrize("value", ["0", "-0.1", "1.1"])
 def test_parse_args_motion_iou_thresh_rejects_invalid_values(value: str) -> None:
     with pytest.raises(ValueError, match="--motion-iou-thresh must be > 0 and <= 1"):

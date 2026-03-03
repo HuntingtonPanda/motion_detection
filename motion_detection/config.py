@@ -23,6 +23,7 @@ class AppConfig:
     det_every_cpu: int = 3
     det_every_cuda: int = 1
     show_fps: bool = False
+    startup_profile: bool = False
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -45,6 +46,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--det-every-cpu", type=int, default=3)
     parser.add_argument("--det-every-cuda", type=int, default=1)
     parser.add_argument("--show-fps", action="store_true")
+    parser.add_argument("--startup-profile", action="store_true")
     return parser
 
 
@@ -77,4 +79,5 @@ def parse_args(argv: list[str] | None = None) -> AppConfig:
         det_every_cpu=args.det_every_cpu,
         det_every_cuda=args.det_every_cuda,
         show_fps=args.show_fps,
+        startup_profile=args.startup_profile,
     )

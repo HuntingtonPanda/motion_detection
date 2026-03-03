@@ -45,6 +45,7 @@ python -m motion_detection.app `
   --previous-seconds 3.0 `
   --det-every-cpu 3 `
   --det-every-cuda 1 `
+  --startup-profile `
   --show-fps
 ```
 
@@ -52,6 +53,7 @@ python -m motion_detection.app `
 
 - Increase `--min-motion-area` if flicker/noise causes false motion.
 - Increase `--motion-iou-thresh` to require more overlap before a track is considered moving.
+- Use `--startup-profile` to print timing for model load, camera open, and the first pipeline pass.
 - Lower `--det-every-cpu` only if your machine can keep up with real-time inference.
 - If CPU performance is low, keep `--det-every-cpu` at `3` or higher to preserve FPS.
 - Increase `--previous-seconds` for longer recent-motion persistence.
