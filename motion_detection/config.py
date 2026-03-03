@@ -16,6 +16,7 @@ class AppConfig:
     device: str = "auto"
     conf_thresh: float = 0.35
     iou_thresh: float = 0.45
+    motion_iou_thresh: float = 0.03
     min_motion_area: int = 1200
     active_seconds: float = 0.5
     previous_seconds: float = 3.0
@@ -37,6 +38,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--device", type=str, default="auto", choices=["auto", "cpu", "cuda"])
     parser.add_argument("--conf-thresh", type=float, default=0.35)
     parser.add_argument("--iou-thresh", type=float, default=0.45)
+    parser.add_argument("--motion-iou-thresh", type=float, default=0.03)
     parser.add_argument("--min-motion-area", type=int, default=1200)
     parser.add_argument("--active-seconds", type=float, default=0.5)
     parser.add_argument("--previous-seconds", type=float, default=3.0)
@@ -56,6 +58,8 @@ def parse_args(argv: list[str] | None = None) -> AppConfig:
         raise ValueError("--det-every-* values must be > 0")
     if args.min_motion_area <= 0:
         raise ValueError("--min-motion-area must be > 0")
+    if args.motion_iou_thresh <= 0 or args.motion_iou_thresh > 1:
+        raise ValueError("--motion-iou-thresh must be > 0 and <= 1")
 
     return AppConfig(
         camera_index=args.camera_index,
@@ -66,6 +70,7 @@ def parse_args(argv: list[str] | None = None) -> AppConfig:
         device=args.device,
         conf_thresh=args.conf_thresh,
         iou_thresh=args.iou_thresh,
+        motion_iou_thresh=args.motion_iou_thresh,
         min_motion_area=args.min_motion_area,
         active_seconds=args.active_seconds,
         previous_seconds=args.previous_seconds,

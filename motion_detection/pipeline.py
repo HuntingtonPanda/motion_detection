@@ -49,20 +49,10 @@ def bbox_iou(a: BBox, b: BBox) -> float:
     return inter / denom
 
 
-def _center_inside(box: BBox, region: BBox) -> bool:
-    x1, y1, x2, y2 = box
-    rx1, ry1, rx2, ry2 = region
-    cx = (x1 + x2) / 2.0
-    cy = (y1 + y2) / 2.0
-    return rx1 <= cx <= rx2 and ry1 <= cy <= ry2
-
-
 def track_overlaps_motion(track_box: BBox, regions: list[MotionRegion], iou_threshold: float = 0.01) -> bool:
     for region in regions:
         region_box = region.bbox_xyxy
         if bbox_iou(track_box, region_box) >= iou_threshold:
-            return True
-        if _center_inside(track_box, region_box):
             return True
     return False
 
@@ -95,7 +85,11 @@ class MotionPipeline:
         tracks = self.tracker.update(detections)
 
         for track in tracks:
-            if track_overlaps_motion(track.bbox_xyxy, motion_regions):
+            if track_overlaps_motion(
+                track.bbox_xyxy,
+                motion_regions,
+                iou_threshold=self.config.motion_iou_thresh,
+            ):
                 self.state_machine.mark_motion(track.track_id, now_ts)
 
             track.state = self.state_machine.get_state(track.track_id, now_ts)

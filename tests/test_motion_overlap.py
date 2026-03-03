@@ -51,10 +51,14 @@ def test_track_overlaps_motion_via_iou() -> None:
     assert track_overlaps_motion((10.0, 10.0, 50.0, 50.0), regions)
 
 
-def test_track_overlaps_motion_via_center_inside() -> None:
-    regions = [MotionRegion(bbox_xyxy=(20.0, 20.0, 80.0, 80.0), area=3600.0)]
-    # Tiny box mostly outside but center remains inside region.
-    assert track_overlaps_motion((61.0, 61.0, 99.0, 99.0), regions)
+def test_track_overlaps_motion_tiny_overlap_below_default_threshold() -> None:
+    regions = [MotionRegion(bbox_xyxy=(0.0, 0.0, 100.0, 100.0), area=10000.0)]
+    assert not track_overlaps_motion((90.0, 90.0, 140.0, 140.0), regions)
+
+
+def test_track_overlaps_motion_tiny_overlap_can_be_enabled_with_lower_threshold() -> None:
+    regions = [MotionRegion(bbox_xyxy=(0.0, 0.0, 100.0, 100.0), area=10000.0)]
+    assert track_overlaps_motion((90.0, 90.0, 140.0, 140.0), regions, iou_threshold=0.007)
 
 
 def test_pipeline_marks_motion_from_overlap_and_transitions_states() -> None:
