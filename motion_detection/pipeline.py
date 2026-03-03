@@ -3,14 +3,30 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Protocol
 
 import numpy as np
 
 from .config import AppConfig
-from .motion import MotionClassifier
 from .state_machine import TrackStateMachine
-from .tracker_sort import SortTracker
-from .types import BBox, MotionRegion, MotionState, Track
+from .types import BBox, Detection, MotionRegion, MotionState, Track
+
+
+class DetectorLike(Protocol):
+    is_cuda: bool
+
+    def detect(self, frame: np.ndarray) -> list[Detection]:
+        ...
+
+
+class TrackerLike(Protocol):
+    def update(self, detections: list[Detection]) -> list[Track]:
+        ...
+
+
+class MotionLike(Protocol):
+    def extract_regions(self, frame: np.ndarray) -> list[MotionRegion]:
+        ...
 
 
 def bbox_iou(a: BBox, b: BBox) -> float:
@@ -60,9 +76,9 @@ class FrameResult:
 @dataclass
 class MotionPipeline:
     config: AppConfig
-    motion: MotionClassifier
-    detector: object
-    tracker: SortTracker
+    motion: MotionLike
+    detector: DetectorLike
+    tracker: TrackerLike
     state_machine: TrackStateMachine
 
     def __post_init__(self) -> None:

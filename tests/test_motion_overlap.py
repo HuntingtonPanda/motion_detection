@@ -82,7 +82,7 @@ def test_pipeline_marks_motion_from_overlap_and_transitions_states() -> None:
         config=config,
         motion=motion,
         detector=detector,
-        tracker=tracker,  # type: ignore[arg-type]
+        tracker=tracker,
         state_machine=state_machine,
     )
     frame = np.zeros((480, 640, 3), dtype=np.uint8)
