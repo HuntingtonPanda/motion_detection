@@ -54,7 +54,7 @@ def test_track_overlaps_motion_via_iou() -> None:
 def test_track_overlaps_motion_via_center_inside() -> None:
     regions = [MotionRegion(bbox_xyxy=(20.0, 20.0, 80.0, 80.0), area=3600.0)]
     # Tiny box mostly outside but center remains inside region.
-    assert track_overlaps_motion((79.0, 79.0, 99.0, 99.0), regions)
+    assert track_overlaps_motion((61.0, 61.0, 99.0, 99.0), regions)
 
 
 def test_pipeline_marks_motion_from_overlap_and_transitions_states() -> None:
