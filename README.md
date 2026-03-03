@@ -1,4 +1,4 @@
-# motion_detection
+﻿# motion_detection
 
 Real-time webcam motion detection with OpenCV MOG2, YOLOv8 person detection, SORT-style tracking, and per-box status indicators.
 
@@ -6,9 +6,10 @@ Real-time webcam motion detection with OpenCV MOG2, YOLOv8 person detection, SOR
 
 - Webcam-only real-time processing at a default `640x480`.
 - Person-only YOLOv8 detection (`yolov8n` default).
+- Always-visible tracked person boxes while the tracker keeps the track alive.
 - Track-level motion states with visual markers:
-  - `💀` means active motion in the last `0.5s`.
-  - `✅` means recently moving in the last `3.0s` but not currently active.
+  - `⚠` means active motion in the last `0.5s` (red box).
+  - `✅` means not currently moving (`RECENT` or `INACTIVE`, green box).
 - Unicode icon rendering with Pillow and graceful ASCII fallback if emoji fonts are unavailable.
 - Auto device selection (`CUDA` if available, otherwise `CPU`).
 
@@ -38,6 +39,7 @@ python -m motion_detection.app `
   --device auto `
   --conf-thresh 0.35 `
   --iou-thresh 0.45 `
+  --motion-iou-thresh 0.03 `
   --min-motion-area 1200 `
   --active-seconds 0.5 `
   --previous-seconds 3.0 `
@@ -49,16 +51,17 @@ python -m motion_detection.app `
 ## Tuning Notes
 
 - Increase `--min-motion-area` if flicker/noise causes false motion.
+- Increase `--motion-iou-thresh` to require more overlap before a track is considered moving.
 - Lower `--det-every-cpu` only if your machine can keep up with real-time inference.
 - If CPU performance is low, keep `--det-every-cpu` at `3` or higher to preserve FPS.
 - Increase `--previous-seconds` for longer recent-motion persistence.
 
 ## Behavior Summary
 
-- A tracked person box is shown when state is `ACTIVE` or `RECENT`.
-- `ACTIVE`: motion overlap detected within `active_seconds`.
-- `RECENT`: no current overlap, but prior overlap is within `previous_seconds`.
-- `INACTIVE`: older than `previous_seconds`; the box is not rendered.
+- A tracked person box is always shown while the SORT tracker still has that track.
+- `ACTIVE`: motion overlap above `motion_iou_thresh` was detected within `active_seconds` (red box, moving marker).
+- `RECENT`: no current overlap, but prior overlap is within `previous_seconds` (green box, checkmark).
+- `INACTIVE`: no overlap for longer than `previous_seconds` or no overlap seen yet (green box, checkmark).
 
 ## Testing
 
