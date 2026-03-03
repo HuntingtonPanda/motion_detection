@@ -74,4 +74,5 @@ def test_pipeline_smoke_active_then_recent_then_inactive() -> None:
     assert np.any(second_render != frame)
 
     third = pipeline.process_frame(frame, now_ts=104.0)
-    assert third.tracks == []
+    assert len(third.tracks) == 1
+    assert third.tracks[0].state == MotionState.INACTIVE

@@ -96,4 +96,5 @@ def test_pipeline_marks_motion_from_overlap_and_transitions_states() -> None:
     assert second.tracks[0].state == MotionState.RECENT
 
     third = pipeline.process_frame(frame, now_ts=4.2)
-    assert third.tracks == []
+    assert len(third.tracks) == 1
+    assert third.tracks[0].state == MotionState.INACTIVE

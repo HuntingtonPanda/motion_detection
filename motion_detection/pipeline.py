@@ -9,7 +9,7 @@ import numpy as np
 
 from .config import AppConfig
 from .state_machine import TrackStateMachine
-from .types import BBox, Detection, MotionRegion, MotionState, Track
+from .types import BBox, Detection, MotionRegion, Track
 
 
 class DetectorLike(Protocol):
@@ -94,16 +94,12 @@ class MotionPipeline:
         detections = self.detector.detect(frame) if should_detect else []
         tracks = self.tracker.update(detections)
 
-        visible_tracks: list[Track] = []
         for track in tracks:
             if track_overlaps_motion(track.bbox_xyxy, motion_regions):
                 self.state_machine.mark_motion(track.track_id, now_ts)
 
             track.state = self.state_machine.get_state(track.track_id, now_ts)
-            if track.state == MotionState.INACTIVE:
-                continue
-            visible_tracks.append(track)
 
         self.state_machine.prune_inactive(now_ts)
         self._frame_idx += 1
-        return FrameResult(tracks=visible_tracks, motion_regions=motion_regions)
+        return FrameResult(tracks=tracks, motion_regions=motion_regions)

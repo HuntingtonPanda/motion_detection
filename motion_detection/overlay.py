@@ -1,4 +1,4 @@
-"""Frame rendering helpers for track boxes, labels, and status indicators."""
+﻿"""Frame rendering helpers for track boxes, labels, and status indicators."""
 
 from __future__ import annotations
 
@@ -49,17 +49,19 @@ class OverlayRenderer:
             x1, y1, _, _ = (int(v) for v in track.bbox_xyxy)
             label_text = f"{track.label} #{track.track_id}"
             draw.text((x1 + 4, max(0, y1 - 22)), label_text, font=self._font, fill=(255, 255, 255))
-            marker = self._marker_for(track.state)
-            draw.text((x1 + 5, y1 + 4), marker, font=self._font, fill=(255, 255, 255))
+            marker_text, marker_color = self._marker_for(track.state)
+            draw.text((x1 + 5, y1 + 4), marker_text, font=self._font, fill=marker_color)
 
         if fps is not None:
             draw.text((8, 8), f"FPS: {fps:.1f}", font=self._font, fill=(255, 220, 90))
 
         return cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
 
-    def _marker_for(self, state: MotionState) -> str:
+    def _marker_for(self, state: MotionState) -> tuple[str, tuple[int, int, int]]:
         if self._force_ascii:
-            return "[ACTIVE]" if state == MotionState.ACTIVE else "[RECENT]"
+            if state == MotionState.ACTIVE:
+                return "[MOVING]", (255, 90, 90)
+            return "[OK]", (90, 220, 90)
         if state == MotionState.ACTIVE:
-            return "💀"
-        return "✅"
+            return "⚠", (255, 90, 90)
+        return "✅", (90, 220, 90)
