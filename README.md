@@ -45,7 +45,41 @@ python -m motion_detection.app `
   --previous-seconds 3.0 `
   --det-every-cpu 3 `
   --det-every-cuda 1 `
+  --ev3-host 192.168.0.20 `
+  --ev3-port 5005 `
   --show-fps
+```
+
+## Send Manual Greet Signal to EV3 (UDP)
+
+If `--ev3-host` is set, press `Space` to send one manual UDP greet signal.
+This avoids per-frame network clutter and lets an operator trigger the robot greeting on demand.
+
+Example packet:
+
+```json
+{
+  "kind": "manual_greet",
+  "timestamp_s": 12.345
+}
+```
+
+Minimal EV3 MicroPython receiver sketch:
+
+```python
+import json
+import socket
+
+PORT = 5005
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.bind(("0.0.0.0", PORT))
+
+while True:
+    data, _ = sock.recvfrom(4096)
+    packet = json.loads(data.decode("utf-8"))
+    if packet.get("kind") == "manual_greet":
+        print("Greet signal received")
+        # Trigger your turn-and-greet behavior here.
 ```
 
 ## Tuning Notes
